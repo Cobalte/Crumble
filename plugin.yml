@@ -1,0 +1,11 @@
+name: Crumble
+version: 0.1
+description: Crumble!
+author: Cobalte
+
+main: io.github.cobalte.Crumble
+
+commands:
+   crumble:
+      description: Sends player to Crumble.
+      usage: /crumble
