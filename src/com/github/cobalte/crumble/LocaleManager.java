@@ -4,18 +4,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Random;
-import org.bukkit.Material;
 
-public class CrumbleLocaleManager {
+public class LocaleManager {
 	
 	// ----------------------------------------------------------------------------------------------------------------\\
 	//    PRIVATE VARS
 	// ----------------------------------------------------------------------------------------------------------------//
 	
 	private static final int MAX_LOCALE_CHUNK_SIZE = 5;
-	private static Random rand;
-	private static ArrayList<CrumbleLocale> locales;
+	private static ArrayList<Locale> locales;
 	
 	// ----------------------------------------------------------------------------------------------------------------\\
 	//    PUBLIC PROPERTIES
@@ -30,7 +27,7 @@ public class CrumbleLocaleManager {
 		ensureManagerIsInitialized();
 		
 		// iterate through all locales, looking for one that covers this chunk
-		for(CrumbleLocale locale : locales) {
+		for(Locale locale : locales) {
 			
 			// get data on this locale to make the following equation easier to read
 			int originX = locale.getOriginX();
@@ -51,7 +48,7 @@ public class CrumbleLocaleManager {
 	public static void initNewLocale(int locX, int locZ) {
 		ensureManagerIsInitialized();
 		
-		//System.out.println("[Crumble] Creating locale covering " + String.valueOf(locX) + "," + String.valueOf(locZ));
+		Crumble.log("Creating locale covering " + String.valueOf(locX) + "," + String.valueOf(locZ), true);
 		
 		/*
 		int sizeX;
@@ -156,7 +153,7 @@ public class CrumbleLocaleManager {
 		} else {
 			newOriginZ = locZ - (locZ % 3) - 2;
 		}
-		CrumbleLocale newLocale = new CrumbleLocale(newOriginX, newOriginZ, 48, 50, 48);
+		Locale newLocale = new Locale(newOriginX, newOriginZ, 48, 50, 48);
 		
 		// add the new locale to the locale array
 		locales.add(newLocale);
@@ -164,10 +161,10 @@ public class CrumbleLocaleManager {
 	}
 	
 	// returns the locale originating at the passed X and Z chunk coordinates
-	public static CrumbleLocale getLocaleContainingCoord(int chunkX, int chunkZ) {
+	public static Locale getLocaleContainingCoord(int chunkX, int chunkZ) {
 		ensureManagerIsInitialized();
 		
-		for (CrumbleLocale result: locales) {
+		for (Locale result: locales) {
 			
 			int originX = result.getOriginX();
 			int originZ = result.getOriginZ();
@@ -184,11 +181,11 @@ public class CrumbleLocaleManager {
 	}
 	
 	// return a material matrix comprising the materials found in a specific locale with a specific chunk offset
-	public static Material[][][] getBuildAtCoord(int chunkX, int chunkZ) {
+	public static Blok[][][] getBuildAtCoord(int chunkX, int chunkZ) {
 		ensureManagerIsInitialized();
 		
 		// search for the locale covering the passed X and Z chunk coords
-		for (CrumbleLocale locale : locales) {
+		for (Locale locale : locales) {
 			
 			// assign vars to make the following equation easier to read
 			int originX = locale.getOriginX();
@@ -207,7 +204,7 @@ public class CrumbleLocaleManager {
 			} 
 		}
 		
-		System.out.println("[Crumble] No locale exists that contains the chunk at " + String.valueOf(chunkX) + "," + String.valueOf(chunkZ));
+		Crumble.log("No locale exists that contains the chunk at " + String.valueOf(chunkX) + "," + String.valueOf(chunkZ), true);
 		return null;
 		
 	}
@@ -219,9 +216,8 @@ public class CrumbleLocaleManager {
 	private static void ensureManagerIsInitialized() {
 		
 		if (locales == null) {
-			System.out.println("[Crumble] Initializing locale manager.");
-			locales = new ArrayList<CrumbleLocale>();
-			rand = new Random();
+			Crumble.log("Initializing locale manager.");
+			locales = new ArrayList<Locale>();
 			Brush.initialize();
 		}
 		

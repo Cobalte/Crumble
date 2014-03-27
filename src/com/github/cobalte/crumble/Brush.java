@@ -1,33 +1,32 @@
 package com.github.cobalte.crumble;
 
 import java.util.ArrayList;
-import java.util.Random;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 
 public class Brush {
-
+	
 	// ----------------------------------------------------------------------------------------------------------------\\
 	//    PRIVATE VARS
 	// ----------------------------------------------------------------------------------------------------------------//
 	
-	private static Random rand;
 	private static ArrayList<Palette> palettes;
-	private static ArrayList<Material[]> choices;
+	private static ArrayList<Blok[]> choices;
 	
 	// ----------------------------------------------------------------------------------------------------------------\\
 	//    PUBLIC METHODS
 	// ----------------------------------------------------------------------------------------------------------------//
 	
-	public static Material pickRandom(Palette pal) {
+	public static Blok pickRandom(Palette pal) {
 		
 		for (int i = 0; i < palettes.size(); i++) {
 			if (palettes.get(i) == pal) {
-				return choices.get(i)[rand.nextInt(choices.get(i).length)];
+				return choices.get(i)[Crumble.getRandInt(choices.get(i).length)];
 			}
 		}
 		
 		// oh shit, something is wrong
-		return Material.SPONGE;
+		return null;
 	}
 	
 	// ----------------------------------------------------------------------------------------------------------------\\
@@ -35,33 +34,32 @@ public class Brush {
 	// ----------------------------------------------------------------------------------------------------------------//
 	
 	public static void initialize() {
-		rand = new Random();
 		palettes = new ArrayList<Palette>();
-		choices = new ArrayList<Material[]>();
-		Material[] mats;
+		choices = new ArrayList<Blok[]>();
+		Blok[] bloks;
 		
-		// define wall		
-		mats = new Material[1];
-		mats[0] = Material.SMOOTH_BRICK;
-		choices.add(mats);
-		palettes.add(Palette.Wall);
+		// define wall
+		bloks = new Blok[1];
+		bloks[0] = new Blok(Material.SMOOTH_BRICK);
+		choices.add(bloks);
+		palettes.add(Palette.WALL);
 		
 		// define floor
-		mats = new Material[3];
-		mats[0] = Material.STONE;
-		mats[1] = Material.STONE;
-		mats[2] = Material.COBBLESTONE;
-		choices.add(mats);
-		palettes.add(Palette.Floor);
+		bloks = new Blok[3];
+		bloks[0] = new Blok(Material.STONE);
+		bloks[1] = new Blok(Material.STONE);
+		bloks[2] = new Blok(Material.COBBLESTONE);
+		choices.add(bloks);
+		palettes.add(Palette.FLOOR);
 		
 		// define road
-		mats = new Material[4];
-		mats[0] = Material.GRAVEL;
-		mats[1] = Material.GRAVEL;
-		mats[2] = Material.GRAVEL;
-		mats[3] = Material.COBBLESTONE;
-		choices.add(mats);
-		palettes.add(Palette.Road);
+		bloks = new Blok[4];
+		bloks[0] = new Blok(Material.GRAVEL);
+		bloks[1] = new Blok(Material.GRAVEL);
+		bloks[2] = new Blok(Material.GRAVEL);
+		bloks[3] = new Blok(Material.COBBLESTONE);
+		choices.add(bloks);
+		palettes.add(Palette.ROAD);
 		
 	}
 }
