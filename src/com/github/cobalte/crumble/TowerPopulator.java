@@ -1,6 +1,7 @@
 
 package com.github.cobalte.crumble;
 
+import java.util.ArrayList;
 import java.util.Random;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -13,14 +14,15 @@ public class TowerPopulator extends BlockPopulator {
   	//    PRIVATE VARS
   	// ----------------------------------------------------------------------------------------------------------------//
 	
-	private final int TOWER_CHANCE = 3; // out of 200
+	private final int TOWER_CHANCE = 1; // out of 200
 	
-	private final int ROOM_HEIGHT = 6;
-	private final int ROOM_WIDTH = 10;
-	private final int MIN_FLOORS = 8;
-	private final int MAX_FLOORS = 14;
-	private final int LOWEST_TOWER_Y = 90;
+	private final int ROOM_HEIGHT = 5;
+	private final int ROOM_WIDTH = 12;
+	private final int MIN_FLOORS = 14;
+	private final int MAX_FLOORS = 28;
+	private final int LOWEST_TOWER_Y = 80;
 	
+	private ArrayList<TowerColumn> columns;
 	
     // ----------------------------------------------------------------------------------------------------------------\\
   	//    PUBLIC METHODS
@@ -32,45 +34,26 @@ public class TowerPopulator extends BlockPopulator {
     		
     		int startX = (source.getX() << 4) + random.nextInt(16);
             int startZ = (source.getZ() << 4) + random.nextInt(16);
+            Crumble.log("Building new tower at coords " + startX + "," + startZ, true);
             
-            int maxFloors = Crumble.rand.nextInt(MAX_FLOORS - MIN_FLOORS) + MIN_FLOORS;
-        	int floorCount;
-        	
-            // central column
-            floorCount = maxFloors;
-        	for (int f = 0; f < floorCount; f++) {
-            	makeRoom(world, startX, (f * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH, ROOM_HEIGHT, ROOM_WIDTH);
-            }
-        	fillArea(world, startX, (floorCount * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
-        	
-        	// north column
-        	floorCount = Crumble.rand.nextInt(maxFloors - 2) + 1;
-        	for (int f = 0; f < floorCount; f++) {
-            	makeRoom(world, startX, (f * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ - ROOM_WIDTH, ROOM_WIDTH, ROOM_HEIGHT, ROOM_WIDTH);
-            }
-        	fillArea(world, startX, (floorCount * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ - ROOM_WIDTH, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
-        	
-        	// west column
-        	floorCount = Crumble.rand.nextInt(maxFloors - 2) + 1;
-        	for (int f = 0; f < floorCount; f++) {
-            	makeRoom(world, startX - ROOM_WIDTH, (f * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH, ROOM_HEIGHT, ROOM_WIDTH);
-            }
-        	fillArea(world, startX - ROOM_WIDTH, (floorCount * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
-        	
-        	// east column
-        	floorCount = Crumble.rand.nextInt(maxFloors - 2) + 1;
-        	for (int f = 0; f < floorCount; f++) {
-            	makeRoom(world, startX + ROOM_WIDTH, (f * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH, ROOM_HEIGHT, ROOM_WIDTH);
-            }
-        	fillArea(world, startX + ROOM_WIDTH, (floorCount * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
-        	
-        	// south column
-        	floorCount = Crumble.rand.nextInt(maxFloors - 2) + 1;
-        	for (int f = 0; f < floorCount; f++) {
-            	makeRoom(world, startX, (f * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ + ROOM_WIDTH, ROOM_WIDTH, ROOM_HEIGHT, ROOM_WIDTH);
-            }
-        	fillArea(world, startX, (floorCount * ROOM_HEIGHT) + LOWEST_TOWER_Y, startZ + ROOM_WIDTH, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
+            // generate tower columns
+            int startingColumns =  Crumble.rand.nextInt(MAX_FLOORS - MIN_FLOORS) + MIN_FLOORS;
+            columns = new ArrayList<TowerColumn>();
+            columns.add(new TowerColumn(0, 0, startingColumns));
+            spreadColumns(0, 0, startingColumns);
     		
+            // build tower columns
+            for (TowerColumn col : columns) {
+            	for (int f = 0; f < col.floors; f++) {
+            		buildRoom(world, col.offsetX * ROOM_WIDTH + startX, f * ROOM_HEIGHT + LOWEST_TOWER_Y, col.offsetZ * ROOM_WIDTH + startZ);
+            	}
+            	// add a roof to this column
+            	int roofX = col.offsetX * ROOM_WIDTH + startX;
+            	int roofY = col.floors * ROOM_HEIGHT + LOWEST_TOWER_Y;
+            	int roofZ = col.offsetZ * ROOM_WIDTH + startZ;
+            	fillArea(world, roofX, roofY, roofZ, ROOM_WIDTH + 1, 1, ROOM_WIDTH + 1, "wall");
+            }
+            
     	}
     	
     }
@@ -79,25 +62,60 @@ public class TowerPopulator extends BlockPopulator {
   	//    PRIVATE METHODS
   	// ----------------------------------------------------------------------------------------------------------------//
     
-    private void makeRoom(World world, int locX, int locY, int locZ, int sizeX, int sizeY, int sizeZ) {
+    private void spreadColumns(int spreaderX, int spreaderZ, int spreaderFloors) {
+    	
+    	if (spreaderFloors > 4) { // we don't want columns to trail out forever
+
+			// spread north
+    		if (getColumnFloorCount(spreaderX, spreaderZ - 1) == 0) {
+    			int newFloors = Crumble.rand.nextInt(spreaderFloors/2) + spreaderFloors/2;
+    			columns.add(new TowerColumn(spreaderX, spreaderZ - 1, newFloors));
+    			spreadColumns(spreaderX, spreaderZ - 1, newFloors);
+    		}
+
+    		// spread south
+    		if (getColumnFloorCount(spreaderX, spreaderZ + 1) == 0) {
+    			int newFloors = Crumble.rand.nextInt(spreaderFloors/2) + spreaderFloors/2;
+    			columns.add(new TowerColumn(spreaderX, spreaderZ + 1, newFloors));
+    			spreadColumns(spreaderX, spreaderZ + 1, newFloors);
+    		}
+    		
+    		// spread west
+    		if (getColumnFloorCount(spreaderX - 1, spreaderZ) == 0) {
+    			int newFloors = Crumble.rand.nextInt(spreaderFloors/2) + spreaderFloors/2;
+    			columns.add(new TowerColumn(spreaderX - 1, spreaderZ, newFloors));
+    			spreadColumns(spreaderX - 1, spreaderZ, newFloors);
+    		}
+    		
+    		// spread east
+    		if (getColumnFloorCount(spreaderX + 1, spreaderZ) == 0) {
+    			int newFloors = Crumble.rand.nextInt(spreaderFloors/2) + spreaderFloors/2;
+    			columns.add(new TowerColumn(spreaderX + 1, spreaderZ, newFloors));
+    			spreadColumns(spreaderX + 1, spreaderZ, newFloors);
+    		}
+        		
+    	}
+    }
+    
+    private void buildRoom(World world, int locX, int locY, int locZ) {
     	
     	// north wall
-        fillArea(world, locX, locY, locZ, sizeX, sizeY, 1, "wall");
+        fillArea(world, locX, locY, locZ, ROOM_WIDTH, ROOM_HEIGHT, 1, "wall");
         
         // west wall
-        fillArea(world, locX, locY, locZ, 1, sizeY, sizeZ, "wall");
+        fillArea(world, locX, locY, locZ, 1, ROOM_HEIGHT, ROOM_WIDTH, "wall");
         
         // south wall
-        fillArea(world, locX, locY, locZ + sizeZ, sizeX + 1, sizeY, 1, "wall");
+        fillArea(world, locX, locY, locZ + ROOM_WIDTH, ROOM_WIDTH + 1, ROOM_HEIGHT, 1, "wall");
         
         // east wall
-        fillArea(world, locX + sizeX, locY, locZ, 1, sizeY, sizeZ, "wall");
+        fillArea(world, locX + ROOM_WIDTH, locY, locZ, 1, ROOM_HEIGHT, ROOM_WIDTH, "wall");
         
         // floor
-        fillArea(world, locX + 1, locY, locZ + 1, sizeX - 1, 1, sizeZ - 1, "floor");
+        fillArea(world, locX + 1, locY, locZ + 1, ROOM_WIDTH - 1, 1, ROOM_WIDTH - 1, "floor");
         
         // inside
-        fillArea(world, locX + 1, locY + 1, locZ + 1, sizeX - 1, sizeY - 1, sizeZ - 1, "air");
+        fillArea(world, locX + 1, locY + 1, locZ + 1, ROOM_WIDTH - 1, ROOM_HEIGHT - 1, ROOM_WIDTH - 1, "air");
         
     }
     
@@ -112,5 +130,36 @@ public class TowerPopulator extends BlockPopulator {
 		}
 		
 	}
+    
+    private int getColumnFloorCount(int OffsetX, int OffsetZ) {
+    	
+    	for (TowerColumn loc : columns) {
+    		if (loc.offsetX == OffsetX && loc.offsetZ == OffsetZ) {
+    			return loc.floors;
+    		}
+    	}
+    	return 0;
+    	
+    }
+    
+    // ----------------------------------------------------------------------------------------------------------------\\
+  	//    PRIVATE CLASS - ROOMLOC
+  	// ----------------------------------------------------------------------------------------------------------------//
+    
+    private class TowerColumn {
+    	
+    	public int offsetX;
+    	public int offsetZ;
+    	public int floors;
+    	
+    	public TowerColumn(int OffsetX, int OffsetZ, int Floors) {
+    		
+    		offsetX = OffsetX;
+    		offsetZ = OffsetZ;
+    		floors = Floors;
+    		
+    	}
+    	
+    }
     
 }
