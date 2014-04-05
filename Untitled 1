@@ -15,7 +15,7 @@ public class Locale {
 	private int blockSizeZ;
 	private int originChunkX;
 	private int originChunkZ;
-	private Blok[][][] contents;
+	private Block[][][] contents;
 	
 	// ----------------------------------------------------------------------------------------------------------------\\
 	//    PUBLIC PROPERTIES
@@ -86,12 +86,16 @@ public class Locale {
 	// populates this locale
 	private void populate() {
 		
-		int wallHeight = Crumble.getRandInt(blockSizeY - 20) + 20;
 		int grassWidth = Crumble.getRandInt(2) * 2 + 2; // 2 or 4
 		int roadWidth = 7;
 		
 		// building
-		createStructure(grassWidth + roadWidth, 0, grassWidth + roadWidth, blockSizeX - (grassWidth * 2) - roadWidth, wallHeight, blockSizeZ - (grassWidth * 2) - roadWidth);
+		int buildLocX = grassWidth + roadWidth;
+		int buildLocZ = grassWidth + roadWidth;
+		int buildSizeX = blockSizeX - (grassWidth * 2) - roadWidth;
+		int buildSizeZ = blockSizeZ - (grassWidth * 2) - roadWidth;
+		int buildSizeY = Crumble.getRandInt(blockSizeY - 20) + 20;
+		createStructure(buildLocX, 0, buildLocZ, buildSizeX, buildSizeY, buildSizeZ);
 
 		// road running north/south
 		fillArea(0, 0, 0, roadWidth, 1, blockSizeZ, Palette.ROAD);
@@ -109,15 +113,19 @@ public class Locale {
 		Material[] sourceMats;
 		
 		// turn bricks to fence
-		sourceMats = new Material[1];
+		sourceMats = new Material[3];
 		sourceMats[0] = Material.SMOOTH_BRICK;
+		sourceMats[1] = Material.STONE;
+		sourceMats[2] = Material.COBBLESTONE;
 		clusteredDecayPass(sourceMats, Material.FENCE);
 		risingDecayPass(sourceMats, Material.FENCE);
 		
 		// turn bricks and fence to air
-		sourceMats = new Material[2];
+		sourceMats = new Material[4];
 		sourceMats[0] = Material.SMOOTH_BRICK;
-		sourceMats[1] = Material.SMOOTH_BRICK;
+		sourceMats[1] = Material.FENCE;
+		sourceMats[2] = Material.STONE;
+		sourceMats[3] = Material.COBBLESTONE;
 		clusteredDecayPass(sourceMats, Material.AIR);
 		risingDecayPass(sourceMats, Material.AIR);
 		
@@ -163,8 +171,6 @@ public class Locale {
 		
 		// TODO: make rising decay real V-shaped decay
 		
-		// TODO: add rising air decay
-		
 	}
 	
 	// make decay spread (recursively) from a starting location
@@ -207,6 +213,7 @@ public class Locale {
 		
 	}
 
+	// check an array of materials for the presence of a separate material
 	private boolean materialFoundInArray(Material mat, Material[] matArray) {
 		
 		for (int i = 0; i < matArray.length; i++) {
@@ -276,8 +283,11 @@ public class Locale {
 		// east wall
 		fillArea(locX + sizeX - 1, locY, locZ, 1, sizeY, sizeZ, Palette.WALL);
 		
-		// floor
-		fillArea(locX, locY, locZ, sizeX, 1, sizeZ, Palette.FLOOR);
+		// floors
+		for (int i = 0; i < sizeY - 1; i+=4) {
+			fillArea(locX, locY + i, locZ, sizeX, 1, sizeZ, Palette.FLOOR);
+		}
+		
 				
 	}
 	

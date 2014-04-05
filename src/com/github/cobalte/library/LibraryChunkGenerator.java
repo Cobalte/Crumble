@@ -1,4 +1,5 @@
-package com.github.cobalte.crumble;
+
+package com.github.cobalte.library;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,13 +12,11 @@ import org.bukkit.World;
 import org.bukkit.util.noise.NoiseGenerator;
 import org.bukkit.util.noise.SimplexNoiseGenerator;
 
-public class CrumbleChunkGenerator extends ChunkGenerator {
-
+public class LibraryChunkGenerator extends ChunkGenerator {
+    
     // ----------------------------------------------------------------------------------------------------------------\\
   	//    PRIVATE VARS
   	// ----------------------------------------------------------------------------------------------------------------//
-	
-	private final double HEIGHT_VARIANCE_INDEX = 0.0625; 
 	
 	private NoiseGenerator generator;
 
@@ -42,42 +41,25 @@ public class CrumbleChunkGenerator extends ChunkGenerator {
     }
     
     public byte[] generate(World world, Random random, int cx, int cz) {
-
+        
     	byte[] result = new byte[32768];
-
+        int height = getHeight(world, cx * 0.0625, cz * 0.0625, 2) + 60;
+        
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-            	
-            	// get random height
-            	int height = getHeight(world, cx + x * HEIGHT_VARIANCE_INDEX, cz + z * HEIGHT_VARIANCE_INDEX, 2) + 100;
-            	
-            	// bedrock layer
-            	for (int y = 0; y <= 1; y++) {
-            		result[(x * 16 + z) * 128 + y] = (byte)Material.BEDROCK.getId();
-            	}
-            	
-            	// stone layer
-            	for (int y = 2; y <= height - 3; y++) {
-            		result[(x * 16 + z) * 128 + y] = (byte)Material.STONE.getId();
-            	}
-            	
-            	// dirt layer
-            	for (int y = height - 3; y <= height - 1; y++) {
-            		result[(x * 16 + z) * 128 + y] = (byte)Material.DIRT.getId();
-            	}
-            	
-            	// grass layer
-            	result[(x * 16 + z) * 128 + height] = (byte)Material.GRASS.getId();
-            	
+                for (int y = 0; y < height; y++) {
+                    result[(x * 16 + z) * 128 + y] = (byte)Material.SMOOTH_BRICK.getId();
+                }
             }
         }
+        
 
         return result;
     }
 
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
-        return Arrays.asList((BlockPopulator)new TowerPopulator());
+        return Arrays.asList((BlockPopulator)new RoomPopulator(), new StackPopulator(), new OrbPopulator());
     }
 
     @Override
@@ -88,4 +70,3 @@ public class CrumbleChunkGenerator extends ChunkGenerator {
         return new Location(world, x, y, z);
     }
 }
-

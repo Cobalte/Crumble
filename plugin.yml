@@ -1,6 +1,6 @@
 name: Crumble
 description: Adds the new Crumble dimension.
-version: 0.1
+version: 0.2
 author: Cobalte
 
 main: com.github.cobalte.crumble.Crumble
@@ -10,3 +10,6 @@ commands:
   crumble:
     description: Sends you to Crumble!
     usage: /crumble
+  library:
+    description: Sends you to the Dusk Library!
+    usage: /library
