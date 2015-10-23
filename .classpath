@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="D:/Minecraft/bukkit-1.7.2-R0.4-20140216.011848-2.jar" sourcepath="/bukkit">
-		<attributes>
-			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="D:/Minecraft/craftbukkit-1.6.4-R2.0.jar" sourcepath="/craftbukkit"/>
-	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+  <classpathentry kind="var" path="M2_REPO/org/bukkit/bukkit/1.7.9-R0.2/bukkit-1.7.9-R0.2.jar"/>
 </classpath>
