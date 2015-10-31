@@ -5,20 +5,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import org.bukkit.Chunk;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.material.Step;
 
-public class CrumbleTowerPopulator extends BlockPopulator {
+public class RuinTowerPopulator extends BlockPopulator {
 
     // ----------------------------------------------------------------------------------------------------------------\\
   	//    CONSTANTS & PRIVATE VARS
   	// ----------------------------------------------------------------------------------------------------------------//
 	
-    private final float CRUMBLE_TOWER_CHANCE_PER_CHUNK = (float)0.0015;
+    private final float POPULATION_CHANCE_PER_CHUNK = (float)0.0010;
     
 	private final int ROOM_HEIGHT = 5;
 	private final int ROOM_WIDTH = 12;
@@ -55,7 +53,7 @@ public class CrumbleTowerPopulator extends BlockPopulator {
   	// ----------------------------------------------------------------------------------------------------------------//
 	
     public void populate(World world, Random random, Chunk source) {
-    	if (random.nextFloat() < CRUMBLE_TOWER_CHANCE_PER_CHUNK) {
+    	if (random.nextFloat() < POPULATION_CHANCE_PER_CHUNK) {
     	    long startTime = System.currentTimeMillis();
     	    int startX = (source.getX() << 4) + random.nextInt(16);
             int startZ = (source.getZ() << 4) + random.nextInt(16);
@@ -97,7 +95,7 @@ public class CrumbleTowerPopulator extends BlockPopulator {
             addConeDecay(world, startX, startZ);
             
             // all done!
-            Crumble.log(String.format("Built a crumble tower in chunk %d, %d (took %.0f ms).",
+            Crumble.log(String.format("Built a ruined tower in chunk %d, %d (took %.0f ms).",
                 source.getX(),
                 source.getZ(),
                 (float) (System.currentTimeMillis() - startTime)));

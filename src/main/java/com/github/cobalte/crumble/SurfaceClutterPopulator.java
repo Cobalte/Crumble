@@ -7,7 +7,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.generator.BlockPopulator;
 
-public class CrumbleSurfaceClutterPopulator extends BlockPopulator {
+public class SurfaceClutterPopulator extends BlockPopulator {
 
     // ----------------------------------------------------------------------------------------------------------------\\
     //    CONSTANTS & PRIVATE VARS
@@ -36,9 +36,11 @@ public class CrumbleSurfaceClutterPopulator extends BlockPopulator {
             int localZ = (source.getZ() << 4) + Crumble.rand.nextInt(16);
             int localY = world.getHighestBlockYAt(localX, localZ);
             
-            Block block = world.getBlockAt(localX, localY, localZ); 
-            block.setType(Material.LONG_GRASS);
-            block.setData((byte) 0x1); // tall grass
+            if (world.getBlockAt(localX, localY, localZ).getType() == Material.GRASS) {
+                Block block = world.getBlockAt(localX, localY, localZ); 
+                block.setType(Material.LONG_GRASS);
+                block.setData((byte) 0x1); // tall grass
+            }
         }
     }
     

@@ -77,8 +77,9 @@ public class CrumbleChunkGenerator extends ChunkGenerator {
     @Override
     public List<BlockPopulator> getDefaultPopulators(World world) {
         return Arrays.asList(
-            new CrumbleSurfaceClutterPopulator(),
-            new CrumbleTowerPopulator());
+            new SurfaceClutterPopulator(),
+            new RuinTowerPopulator(),
+            new SkySquarePopulator());
     }
 
     @Override
